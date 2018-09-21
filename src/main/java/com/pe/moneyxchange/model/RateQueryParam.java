@@ -7,13 +7,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class QuotationQueryParam {
+public class RateQueryParam {
 
   @Pattern(regexp = "^-?\\d*\\.\\d+$")
   @NotNull
   private String amount;
 
   @NotNull
-  private String quotationType;
+  private String rateType;
 
 }

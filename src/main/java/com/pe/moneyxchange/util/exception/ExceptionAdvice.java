@@ -1,5 +1,6 @@
 package com.pe.moneyxchange.util.exception;
 
+import com.mongodb.MongoException;
 import com.pe.moneyxchange.model.ResponseError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,12 @@ public class ExceptionAdvice {
     return buildResponseError(ex.getMessage());
   }
 
+  @ExceptionHandler(MongoException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public ResponseError getResponseConecctionError(DataNotFoundException ex) {
+    return buildResponseError(ex.getMessage());
+  }
 
   private  ResponseError buildResponseError(String message) {
     ResponseError error = new ResponseError();
