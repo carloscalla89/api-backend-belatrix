@@ -21,7 +21,7 @@ public class MongoDaoFactory extends DaoFactory {
 
 
   @Override
-  public RateDao rateDao() {
+  public RateDao getRateDao() {
     return new MongoRateDaoImpl();
   }
 }

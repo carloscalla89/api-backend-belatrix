@@ -6,7 +6,7 @@ import com.pe.moneyxchange.util.Constants;
 
 public abstract class DaoFactory {
 
-    public abstract RateDao rateDao();
+    public abstract RateDao getRateDao();
 
     public static DaoFactory getFactory(int typeDB) {
 
