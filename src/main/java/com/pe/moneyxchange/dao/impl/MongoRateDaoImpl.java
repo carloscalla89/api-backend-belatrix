@@ -25,7 +25,7 @@ public class MongoRateDaoImpl implements RateDao<RateResponse> {
         MongoDatabase database = mongoConnection.getMongo().getDatabase(MONGO_DATABASE);
         MongoCollection<Document> mongoCollection = database.getCollection(MONGO_EXCHANGE_COLLECTION);
 
-        Document document = mongoCollection.find(Filters.eq("typeRate",typeRate)).first();
+        Document document = mongoCollection.find(Filters.eq("rateType",typeRate)).first();
 
         return Optional.ofNullable(document).map(
                 doc -> Optional.ofNullable(doc.getDouble("rateValue"))

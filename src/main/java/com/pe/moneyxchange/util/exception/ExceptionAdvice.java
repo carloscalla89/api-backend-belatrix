@@ -21,7 +21,14 @@ public class ExceptionAdvice {
   @ExceptionHandler(MongoException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
-  public ResponseError getResponseConecctionError(DataNotFoundException ex) {
+  public ResponseError getResponseConecctionError(MongoException ex) {
+    return buildResponseError(ex.getMessage());
+  }
+
+  @ExceptionHandler(Exception.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public ResponseError getResponseGeneralError(Exception ex) {
     return buildResponseError(ex.getMessage());
   }
 
