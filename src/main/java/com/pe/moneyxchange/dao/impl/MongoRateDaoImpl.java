@@ -28,12 +28,13 @@ public class MongoRateDaoImpl implements RateDao<RateResponse> {
         Document document = mongoCollection.find(Filters.eq("rateType",typeRate)).first();
 
         return Optional.ofNullable(document).map(
-                doc -> Optional.ofNullable(doc.getDouble("rateValue"))
+                doc -> Optional.ofNullable(doc.getDouble("rateValue2"))
                         .map(r -> RateResponse.builder()
                                 .setRates(r)
                                 .setChangedAmount(r*amount)
-                                .build())).get()
-                .orElseThrow(() -> new DataNotFoundException("No se encontró resultados."));
+                                .build()).get()
+        ).orElseThrow(() -> new DataNotFoundException("Not found results."));
+
 
 
 
