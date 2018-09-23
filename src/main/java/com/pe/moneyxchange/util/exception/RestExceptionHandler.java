@@ -1,5 +1,6 @@
 package com.pe.moneyxchange.util.exception;
 
+import com.pe.moneyxchange.model.ResponseError;
 import com.pe.moneyxchange.model.ResponseRateError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -18,46 +19,67 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
 public class RestExceptionHandler  extends ResponseEntityExceptionHandler {
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-        logger.info(ex.getClass().getName());
-        //
-        final List<String> errors = new ArrayList<String>();
-        for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.add(error.getField() + ": " + error.getDefaultMessage());
-        }
-        for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-            errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
-        }
-        final ResponseRateError apiError = new ResponseRateError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-        return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<ResponseRateError> DataNotFoundException(
             DataNotFoundException ex) {
 
-        ResponseRateError response = new ResponseRateError(HttpStatus.BAD_REQUEST);
+        ResponseRateError response = new ResponseRateError();
         response.setMessage(ex.getMessage());
 
         return new ResponseEntity<>(response, new HttpHeaders(),HttpStatus.NOT_FOUND);
 
     }
 
-    private  List<String> fromBindingErrors(Errors errors) {
-        List<String> validErrors = new ArrayList<String>();
-        for (ObjectError objectError : errors.getAllErrors()) {
-            validErrors.add(objectError.getDefaultMessage());
-        }
-        return validErrors;
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ResponseRateError> BadCredentialsException(
+            BadCredentialsException ex) {
+
+        ResponseRateError response = new ResponseRateError();
+        response.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(response, new HttpHeaders(),HttpStatus.UNAUTHORIZED);
+
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<ResponseRateError> handleAllExceptions(Exception ex) {
+
+        ResponseError responseError = new ResponseError(ex.getMessage());
+        ResponseRateError errorDetails = new ResponseRateError();
+        errorDetails.setMessage("Unexpected error");
+        errorDetails.setErrors(Arrays.asList(responseError));
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(CustomValidationException.class)
+    public ResponseEntity<ResponseRateError> customValidationException(
+            CustomValidationException ex) {
+
+        List<ResponseError> responseErrorList= ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(fieldError -> new ResponseError(
+                        fieldError.getField(),
+                        fieldError.getCode(),
+                        fieldError.getDefaultMessage()))
+                .collect(Collectors.toList());
+        ResponseRateError response = new ResponseRateError();
+        response.setErrors(responseErrorList);
+        response.setMessage("Error in Validations");
+
+        return new ResponseEntity<>(response, new HttpHeaders(),HttpStatus.BAD_REQUEST);
+
     }
 }

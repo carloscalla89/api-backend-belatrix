@@ -1,6 +1,8 @@
 package com.pe.moneyxchange.factory.mongo;
 
+import com.pe.moneyxchange.dao.LoginDao;
 import com.pe.moneyxchange.dao.RateDao;
+import com.pe.moneyxchange.dao.impl.MongoLoginDao;
 import com.pe.moneyxchange.dao.impl.MongoRateDaoImpl;
 import com.pe.moneyxchange.factory.DaoFactory;
 
@@ -23,5 +25,10 @@ public class MongoDaoFactory extends DaoFactory {
   @Override
   public RateDao getRateDao() {
     return new MongoRateDaoImpl();
+  }
+
+  @Override
+  public LoginDao getLoginDao() {
+    return new MongoLoginDao();
   }
 }

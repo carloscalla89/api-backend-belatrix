@@ -1,13 +1,24 @@
 package com.pe.moneyxchange.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseError {
-  private String errorMessage;
+  private String field;
+  private String code;
+  private Object description;
 
-  public String getErrorMessage() {
-    return errorMessage;
+  public ResponseError(String field, String code, Object rejectedValue) {
+    this.field = field;
+    this.code = code;
+    this.description = rejectedValue;
   }
+  public ResponseError(Object rejectedValue) {
+    this.description = rejectedValue;
 
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
   }
 }

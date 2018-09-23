@@ -1,6 +1,7 @@
 package com.pe.moneyxchange.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -18,30 +19,14 @@ import java.util.Set;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseRateError {
-    private HttpStatus status;
+
     private String message;
-    private List<String> errors;
+    private List<ResponseError> errors;
 
     public ResponseRateError() {
         super();
-    }
-    public ResponseRateError(HttpStatus status, String message, List<String> errors) {
-        super();
-        this.status = status;
-        this.message = message;
-        this.errors = errors;
-    }
-
-    public ResponseRateError(HttpStatus status) {
-        this.status = status;
-    }
-
-    public ResponseRateError(HttpStatus status, String message, String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = Arrays.asList(error);
     }
 }
 

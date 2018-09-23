@@ -19,7 +19,7 @@ import java.util.Optional;
 public class MongoRateDaoImpl implements RateDao<RateResponse> {
 
     @Override
-    public RateResponse getRate(String typeRate,double amount) throws Exception {
+    public RateResponse getRate(String typeRate,String amount) throws Exception {
 
         MongoConnection mongoConnection = MongoDaoFactory.createConnection();
         MongoDatabase database = mongoConnection.getMongo().getDatabase(MONGO_DATABASE);
@@ -31,7 +31,7 @@ public class MongoRateDaoImpl implements RateDao<RateResponse> {
                 doc -> Optional.ofNullable(doc.getDouble("rateValue"))
                         .map(r -> RateResponse.builder()
                                 .setRates(r)
-                                .setChangedAmount(r*amount)
+                                .setChangedAmount(r*Double.parseDouble(amount.replace(",","")))
                                 .build()).get()
         ).orElseThrow(() -> new DataNotFoundException("Not found results."));
 

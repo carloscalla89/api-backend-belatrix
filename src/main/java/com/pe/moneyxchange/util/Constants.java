@@ -10,4 +10,5 @@ public class Constants {
 
     public static final String MONGO_DATABASE = "dbMoneyExchange";
     public static final String MONGO_EXCHANGE_COLLECTION = "RateExchangeCollection";
+    public static final String MONGO_USER_COLLECTION = "UserLoginCollection";
 }
