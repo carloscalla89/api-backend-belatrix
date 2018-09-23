@@ -18,8 +18,13 @@ import javax.validation.Valid;
 @RequestMapping("/money-exchange")
 public class RateController {
 
-  @Autowired
+
   private RateService rateService;
+
+  @Autowired
+  public RateController(RateService rateService) {
+    this.rateService = rateService;
+  }
 
   @GetMapping(value="/rate")
   public ResponseEntity<RateResponse> moneyExchange(@Valid RateQueryParam quotationQueryParam,BindingResult bindingResult) throws Exception {

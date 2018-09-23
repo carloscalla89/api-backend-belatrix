@@ -16,6 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,6 +48,33 @@ public class LoginControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(request)))
                 .andDo(print()).andExpect(status().isAccepted());
+    }
+
+
+    @Test
+    public void loginIsSuccess() throws Exception {
+        LoginRequest request = new LoginRequest();
+
+        request.setPassword("carlos");
+        request.setUsername("1234");
+
+        when(loginService.isLoginValid(anyString(),anyString())).thenReturn(true);
+
+        loginController = new LoginController(loginService);
+        loginController.login(request);
+    }
+
+    @Test
+    public void loginIsIncorrect() throws Exception {
+        LoginRequest request = new LoginRequest();
+
+        request.setPassword("carlos");
+        request.setUsername("12345");
+
+        when(loginService.isLoginValid(anyString(),anyString())).thenReturn(false);
+
+        loginController = new LoginController(loginService);
+        loginController.login(request);
     }
 
     public static String asJsonString(final Object obj) {

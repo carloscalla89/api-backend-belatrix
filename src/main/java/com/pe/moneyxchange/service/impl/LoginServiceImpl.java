@@ -18,7 +18,7 @@ public class LoginServiceImpl implements LoginService {
 
   }
 
-
+  @Override
   public boolean isLoginValid(String username, String password) throws Exception {
     return loginDao.login(username,password);
   }
