@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
-@SpringBootApplication(exclude = {MongoRepositoriesAutoConfiguration.class,SecurityAutoConfiguration.class})
+@SpringBootApplication(exclude = {MongoRepositoriesAutoConfiguration.class})
 public class MoneyxchangeApplication {
 
 	public static void main(String[] args) {

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/money-exchange")
 public class LoginController {
 
-  private final LoginService loginService;
+  private LoginService loginService;
 
   @Autowired
   public LoginController(LoginService loginService) {

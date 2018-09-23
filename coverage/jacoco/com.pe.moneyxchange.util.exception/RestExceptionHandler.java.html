@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">moneyxchange</a> &gt; <a href="index.source.html" class="el_package">com.pe.moneyxchange.util.exception</a> &gt; <span class="el_source">RestExceptionHandler.java</span></div><h1>RestExceptionHandler.java</h1><pre class="source lang-java linenums">package com.pe.moneyxchange.util.exception;
+
+import com.pe.moneyxchange.model.ResponseError;
+import com.pe.moneyxchange.model.ResponseRateError;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.rmi.UnexpectedException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@ControllerAdvice
+<span class="fc" id="L31">@Slf4j</span>
+<span class="fc" id="L32">public class RestExceptionHandler  extends ResponseEntityExceptionHandler {</span>
+
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity&lt;ResponseRateError&gt; DataNotFoundException(
+            DataNotFoundException ex) {
+
+<span class="nc" id="L38">        ResponseRateError response = new ResponseRateError();</span>
+<span class="nc" id="L39">        response.setMessage(ex.getMessage());</span>
+
+<span class="nc" id="L41">        return new ResponseEntity&lt;&gt;(response, new HttpHeaders(),HttpStatus.NOT_FOUND);</span>
+
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity&lt;ResponseRateError&gt; BadCredentialsException(
+            BadCredentialsException ex) {
+
+<span class="nc" id="L49">        ResponseRateError response = new ResponseRateError();</span>
+<span class="nc" id="L50">        response.setMessage(ex.getMessage());</span>
+
+<span class="nc" id="L52">        return new ResponseEntity&lt;&gt;(response, new HttpHeaders(),HttpStatus.UNAUTHORIZED);</span>
+
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity&lt;ResponseRateError&gt; handleAllExceptions(Exception ex) {
+
+<span class="nc" id="L60">        ResponseError responseError = new ResponseError(ex.getMessage());</span>
+<span class="nc" id="L61">        ResponseRateError errorDetails = new ResponseRateError();</span>
+<span class="nc" id="L62">        errorDetails.setMessage(&quot;Unexpected error&quot;);</span>
+<span class="nc" id="L63">        errorDetails.setErrors(Arrays.asList(responseError));</span>
+<span class="nc" id="L64">        return new ResponseEntity&lt;&gt;(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+    }
+
+    @ExceptionHandler(CustomValidationException.class)
+    public ResponseEntity&lt;ResponseRateError&gt; customValidationException(
+            CustomValidationException ex) {
+
+<span class="nc" id="L71">        List&lt;ResponseError&gt; responseErrorList= ex.getBindingResult().getFieldErrors()</span>
+<span class="nc" id="L72">                .stream()</span>
+<span class="nc" id="L73">                .map(fieldError -&gt; new ResponseError(</span>
+<span class="nc" id="L74">                        fieldError.getField(),</span>
+<span class="nc" id="L75">                        fieldError.getCode(),</span>
+<span class="nc" id="L76">                        fieldError.getDefaultMessage()))</span>
+<span class="nc" id="L77">                .collect(Collectors.toList());</span>
+<span class="nc" id="L78">        ResponseRateError response = new ResponseRateError();</span>
+<span class="nc" id="L79">        response.setErrors(responseErrorList);</span>
+<span class="nc" id="L80">        response.setMessage(&quot;Error in Validations&quot;);</span>
+
+<span class="nc" id="L82">        return new ResponseEntity&lt;&gt;(response, new HttpHeaders(),HttpStatus.BAD_REQUEST);</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
