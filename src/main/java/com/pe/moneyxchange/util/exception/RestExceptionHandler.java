@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -64,7 +65,7 @@ public class RestExceptionHandler  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(CustomValidationException.class)
+    @ExceptionHandler({CustomValidationException.class})
     public ResponseEntity<ResponseRateError> customValidationException(
             CustomValidationException ex) {
 
@@ -77,9 +78,50 @@ public class RestExceptionHandler  extends ResponseEntityExceptionHandler {
                 .collect(Collectors.toList());
         ResponseRateError response = new ResponseRateError();
         response.setErrors(responseErrorList);
-        response.setMessage("Error in Validations");
+        response.setMessage("Error in Validations QueryParam");
 
         return new ResponseEntity<>(response, new HttpHeaders(),HttpStatus.BAD_REQUEST);
 
     }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+        List<ResponseError> responseErrorList= ex.getBindingResult().getFieldErrors()
+            .stream()
+            .map(fieldError -> new ResponseError(
+                fieldError.getField(),
+                fieldError.getCode(),
+                fieldError.getDefaultMessage()))
+            .collect(Collectors.toList());
+        ResponseRateError response = new ResponseRateError();
+        response.setErrors(responseErrorList);
+        response.setMessage("Error in Validations");
+
+        return new ResponseEntity<>(response, new HttpHeaders(),HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+        HttpRequestMethodNotSupportedException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(ex.getMethod());
+        builder.append(
+            " method is not supported for this request. Supported methods are ");
+        ex.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
+
+        ResponseError responseError = new ResponseError(ex.getLocalizedMessage(),builder.toString());
+        ResponseRateError response = new ResponseRateError();
+        response.setErrors(Arrays.asList(responseError));
+        response.setMessage("MethodNotSupported");
+
+        return new ResponseEntity<>(
+            response, new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
 }

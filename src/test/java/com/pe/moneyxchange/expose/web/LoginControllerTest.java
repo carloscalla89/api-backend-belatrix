@@ -36,21 +36,6 @@ public class LoginControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Ignore
-    @Test
-    public void loginIsOk() throws Exception {
-        LoginRequest request = new LoginRequest();
-
-        request.setPassword("carlos");
-        request.setUsername("1234");
-
-        this.mockMvc.perform(post("/money-exchange/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(request)))
-                .andDo(print()).andExpect(status().isAccepted());
-    }
-
-
     @Test
     public void loginIsSuccess() throws Exception {
         LoginRequest request = new LoginRequest();

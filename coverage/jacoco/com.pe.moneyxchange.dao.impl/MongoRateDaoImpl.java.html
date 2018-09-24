@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoRateDaoImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">moneyxchange</a> &gt; <a href="index.source.html" class="el_package">com.pe.moneyxchange.dao.impl</a> &gt; <span class="el_source">MongoRateDaoImpl.java</span></div><h1>MongoRateDaoImpl.java</h1><pre class="source lang-java linenums">package com.pe.moneyxchange.dao.impl;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoRateDaoImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">moneyxchange</a> &gt; <a href="index.source.html" class="el_package">com.pe.moneyxchange.dao.impl</a> &gt; <span class="el_source">MongoRateDaoImpl.java</span></div><h1>MongoRateDaoImpl.java</h1><pre class="source lang-java linenums">package com.pe.moneyxchange.dao.impl;
 
 import static com.pe.moneyxchange.util.Constants.MONGO_DATABASE;
 import static com.pe.moneyxchange.util.Constants.MONGO_EXCHANGE_COLLECTION;
@@ -12,32 +12,32 @@ import com.pe.moneyxchange.factory.mongo.MongoConnection;
 import com.pe.moneyxchange.factory.mongo.MongoDaoFactory;
 import com.pe.moneyxchange.model.RateResponse;
 import com.pe.moneyxchange.util.exception.DataNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
+import java.util.Map;
 import java.util.Optional;
-
-<span class="fc" id="L19">public class MongoRateDaoImpl implements RateDao&lt;RateResponse&gt; {</span>
+<span class="fc" id="L20">@Slf4j</span>
+<span class="fc" id="L21">public class MongoRateDaoImpl implements RateDao&lt;RateResponse&gt; {</span>
 
     @Override
-    public RateResponse getRate(String typeRate,String amount) throws Exception {
+    public RateResponse getRate(String base, String target, String amount) throws Exception {
+<span class="fc" id="L25">        log.info(&quot;MongoRateDaoImpl&quot;);</span>
+<span class="fc" id="L26">        MongoConnection mongoConnection = MongoDaoFactory.createConnection();</span>
+<span class="fc" id="L27">        MongoDatabase database = mongoConnection.getMongo().getDatabase(MONGO_DATABASE);</span>
+<span class="fc" id="L28">        MongoCollection&lt;Document&gt; mongoCollection = database.getCollection(MONGO_EXCHANGE_COLLECTION);</span>
 
-<span class="fc" id="L24">        MongoConnection mongoConnection = MongoDaoFactory.createConnection();</span>
-<span class="fc" id="L25">        MongoDatabase database = mongoConnection.getMongo().getDatabase(MONGO_DATABASE);</span>
-<span class="fc" id="L26">        MongoCollection&lt;Document&gt; mongoCollection = database.getCollection(MONGO_EXCHANGE_COLLECTION);</span>
+<span class="fc" id="L30">        Document document = mongoCollection.find(Filters.and(Filters.eq(&quot;base&quot;, base),</span>
+<span class="fc" id="L31">                Filters.exists(String.format(&quot;rates.%s&quot;,target))))</span>
+<span class="fc" id="L32">                .first();</span>
 
-<span class="fc" id="L28">        Document document = mongoCollection.find(Filters.eq(&quot;rateType&quot;,typeRate)).first();</span>
-
-<span class="fc" id="L30">        return Optional.ofNullable(document).map(</span>
-<span class="fc" id="L31">                doc -&gt; Optional.ofNullable(doc.getDouble(&quot;rateValue&quot;))</span>
-<span class="fc" id="L32">                        .map(r -&gt; RateResponse.builder()</span>
-<span class="fc" id="L33">                                .setRates(r)</span>
-<span class="fc" id="L34">                                .setChangedAmount(r*Double.parseDouble(amount.replace(&quot;,&quot;,&quot;&quot;)))</span>
-<span class="fc" id="L35">                                .build()).get()</span>
-<span class="fc" id="L36">        ).orElseThrow(() -&gt; new DataNotFoundException(&quot;Not found results.&quot;));</span>
-
-
-
-
+<span class="fc" id="L34">        return Optional.ofNullable(document).map(</span>
+<span class="fc" id="L35">                doc -&gt; Optional.ofNullable(doc.get(&quot;rates&quot;,Map.class))</span>
+<span class="fc" id="L36">                        .map(r -&gt; RateResponse.builder()</span>
+<span class="fc" id="L37">                                .setRates(Double.parseDouble((String)r.get(target)))</span>
+<span class="fc" id="L38">                                .setChangedAmount((Double.parseDouble((String)r.get(target)))*Double.parseDouble(amount.replace(&quot;,&quot;,&quot;&quot;)))</span>
+<span class="fc" id="L39">                                .build()).get()</span>
+<span class="fc" id="L40">        ).orElseThrow(() -&gt; new DataNotFoundException(&quot;Not found results.&quot;));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

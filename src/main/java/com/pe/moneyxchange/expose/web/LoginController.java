@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/money-exchange")
 public class LoginController {
@@ -23,7 +25,7 @@ public class LoginController {
 
 
   @PostMapping("/login")
-  public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) throws Exception {
+  public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest loginRequest) throws Exception {
 
     if (loginService.isLoginValid(loginRequest.getUsername(),
       loginRequest.getPassword())) {
