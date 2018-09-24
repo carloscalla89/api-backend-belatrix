@@ -40,17 +40,18 @@ public class RateControllerTest {
     public void moneyExchangeIsSuccess() throws Exception {
         RateQueryParam rateQueryParam = new RateQueryParam();
         rateQueryParam.setAmount("123");
-        rateQueryParam.setRateType("USD-EU");
+        rateQueryParam.setBase("USD");
+        rateQueryParam.setTarget("EUR");
 
        RateResponse rateResponse = RateResponse.builder()
                .setChangedAmount(123.0)
                .setRates(1.9)
                .build();
 
-        when(rateService.getRateValue(anyString(),anyString())).thenReturn(rateResponse);
+        when(rateService.getRate(anyString(),anyString(),anyString())).thenReturn(rateResponse);
 
         rateController = new RateController(rateService);
-        rateController.moneyExchange(rateQueryParam,getBindingResult(false));
+        rateController.moneyExchangeRate(rateQueryParam,getBindingResult(false));
 
     }
 
@@ -58,17 +59,18 @@ public class RateControllerTest {
     public void moneyExchangeIsIncorrect() throws Exception {
         RateQueryParam rateQueryParam = new RateQueryParam();
         rateQueryParam.setAmount("123");
-        rateQueryParam.setRateType("USD-EU");
+        rateQueryParam.setBase("USssD");
+        rateQueryParam.setTarget("EUR");
 
         RateResponse rateResponse = RateResponse.builder()
                 .setChangedAmount(123.00)
                 .setRates(1.9)
                 .build();
 
-        when(rateService.getRateValue(anyString(),anyString())).thenReturn(rateResponse);
+        when(rateService.getRate(anyString(),anyString(),anyString())).thenReturn(rateResponse);
 
         rateController = new RateController(rateService);
-        rateController.moneyExchange(rateQueryParam,getBindingResult(true));
+        rateController.moneyExchangeRate(rateQueryParam,getBindingResult(true));
 
     }
 

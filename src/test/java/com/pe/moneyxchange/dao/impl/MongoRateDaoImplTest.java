@@ -20,11 +20,11 @@ public class MongoRateDaoImplTest {
 
     @Test
     public void getRateResponseOk() throws Exception{
-        mongoRateDao.getRate("USD-EU", "123");
+        mongoRateDao.getRate("USD","EUR", "123");
     }
 
     @Test(expected = DataNotFoundException.class)
     public void getRateResponseException() throws Exception{
-        mongoRateDao.getRate("err", "123");
+        mongoRateDao.getRate("ERT","EUR", "123");
     }
 }

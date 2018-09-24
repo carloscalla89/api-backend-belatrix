@@ -12,31 +12,31 @@ import com.pe.moneyxchange.factory.mongo.MongoConnection;
 import com.pe.moneyxchange.factory.mongo.MongoDaoFactory;
 import com.pe.moneyxchange.model.RateResponse;
 import com.pe.moneyxchange.util.exception.DataNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
+import java.util.Map;
 import java.util.Optional;
-
+@Slf4j
 public class MongoRateDaoImpl implements RateDao<RateResponse> {
 
     @Override
-    public RateResponse getRate(String typeRate,String amount) throws Exception {
-
+    public RateResponse getRate(String base, String target, String amount) throws Exception {
+        log.info("MongoRateDaoImpl");
         MongoConnection mongoConnection = MongoDaoFactory.createConnection();
         MongoDatabase database = mongoConnection.getMongo().getDatabase(MONGO_DATABASE);
         MongoCollection<Document> mongoCollection = database.getCollection(MONGO_EXCHANGE_COLLECTION);
 
-        Document document = mongoCollection.find(Filters.eq("rateType",typeRate)).first();
+        Document document = mongoCollection.find(Filters.and(Filters.eq("base", base),
+                Filters.exists(String.format("rates.%s",target))))
+                .first();
 
         return Optional.ofNullable(document).map(
-                doc -> Optional.ofNullable(doc.getDouble("rateValue"))
+                doc -> Optional.ofNullable(doc.get("rates",Map.class))
                         .map(r -> RateResponse.builder()
-                                .setRates(r)
-                                .setChangedAmount(r*Double.parseDouble(amount.replace(",","")))
+                                .setRates(Double.parseDouble((String)r.get(target)))
+                                .setChangedAmount((Double.parseDouble((String)r.get(target)))*Double.parseDouble(amount.replace(",","")))
                                 .build()).get()
         ).orElseThrow(() -> new DataNotFoundException("Not found results."));
-
-
-
-
     }
 }

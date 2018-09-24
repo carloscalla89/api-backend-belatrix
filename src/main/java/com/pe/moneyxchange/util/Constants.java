@@ -9,6 +9,6 @@ public class Constants {
     public static final int MONGO = 1;
 
     public static final String MONGO_DATABASE = "dbMoneyExchange";
-    public static final String MONGO_EXCHANGE_COLLECTION = "RateExchangeCollection";
+    public static final String MONGO_EXCHANGE_COLLECTION = "ExchangeRateCollection";
     public static final String MONGO_USER_COLLECTION = "UserLoginCollection";
 }

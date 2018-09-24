@@ -4,6 +4,7 @@ import com.pe.moneyxchange.model.RateQueryParam;
 import com.pe.moneyxchange.model.RateResponse;
 import com.pe.moneyxchange.service.RateService;
 import com.pe.moneyxchange.util.exception.CustomValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/money-exchange")
+@Slf4j
 public class RateController {
 
 
@@ -26,15 +28,15 @@ public class RateController {
     this.rateService = rateService;
   }
 
-  @GetMapping(value="/rate")
-  public ResponseEntity<RateResponse> moneyExchange(@Valid RateQueryParam quotationQueryParam,BindingResult bindingResult) throws Exception {
-
+  @GetMapping(value="/exchangeRate")
+  public ResponseEntity<RateResponse> moneyExchangeRate(@Valid RateQueryParam quotationQueryParam,BindingResult bindingResult) throws Exception {
+    log.info("quotationQueryParam:"+quotationQueryParam);
     if (bindingResult.hasErrors()) {
       throw new CustomValidationException(bindingResult);
     }
 
     RateResponse rateResponse= rateService
-            .getRateValue(quotationQueryParam.getRateType(),quotationQueryParam.getAmount());
+            .getRate(quotationQueryParam.getBase(),quotationQueryParam.getTarget(),quotationQueryParam.getAmount());
 
     return ResponseEntity.ok(rateResponse);
   }

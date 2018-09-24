@@ -19,7 +19,7 @@ public class RateServiceImpl implements RateService {
     }
 
     @Override
-    public RateResponse getRateValue(String typeRate, String amount) throws Exception {
-        return rateResponseRateDao.getRate(typeRate, amount);
+    public RateResponse getRate(String base, String target, String amount) throws Exception {
+        return rateResponseRateDao.getRate(base, target, amount);
     }
 }
